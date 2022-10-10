@@ -28,6 +28,12 @@ namespace raven
 
             cTCPex();
 
+            /// @brief Connect to server
+            /// @param server_address 
+            /// @param server_port 
+            /// @param readHandler 
+            /// @return true if connected
+            
             bool connect_to_server(
                 const std::string &server_address,
                 const std::string &server_port,

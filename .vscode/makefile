@@ -23,6 +23,7 @@ static_link_flags = -static-libstdc++ -static-libgcc -static $(OPT)
 # sources
 OBJ_client_console = \
 	$(ODIR)/client_console_tcpex.o \
+	$(ODIR)/cClient.o \
 	$(ODIR)/cTCPex.o \
 
 ### COMPILE
