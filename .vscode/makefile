@@ -2,8 +2,8 @@
 VPATH = ./src 
 
 	# compiler include search paths
-# INCS = -I./include \
-# 	-I../ravencode/pub/src \
+ INCS = \
+ 	-I../ravencode/pub/src
 # 	-I../raven-set \
 # 	-I../boost/boost1_78 
 
@@ -26,6 +26,12 @@ OBJ_client_console = \
 	$(ODIR)/cClient.o \
 	$(ODIR)/cTCPex.o \
 
+# sources
+OBJ_client_gui = \
+	$(ODIR)/client_gui_tcpex.o \
+	$(ODIR)/cClient.o \
+	$(ODIR)/cTCPex.o \
+
 ### COMPILE
 
 $(ODIR)/%.o: %.cpp  
@@ -34,6 +40,10 @@ $(ODIR)/%.o: %.cpp
 
 client_console: $(OBJ_client_console)
 	g++ -o bin/client_console.exe \
+	$^ $(static_link_flags) $(LIBS)
+
+client_gui: $(OBJ_client_gui)
+	g++ -o bin/client_gui.exe \
 	$^ $(static_link_flags) $(LIBS)
 
 .PHONY: clean

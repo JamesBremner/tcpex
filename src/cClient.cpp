@@ -6,21 +6,9 @@
 #include <algorithm>
 #include "cCommandParser.h"
 #include "await.h"
-#include "cTCPex.h"
 #include "cClient.h"
 
 std::string cClient::myString;
-
-cClient::cClient(int argc, char *argv[])
-{
-        parse_command_line_options(
-        argc,
-        argv);
-
-    connect_to_server();
-
-    run();
-}
 
 std::string cClient::msgProcessor(
     int client,
@@ -30,6 +18,14 @@ std::string cClient::msgProcessor(
     return "";
 }
 
+void cClient::connect_to_server(
+    const std::string &serverAddress,
+    const std::string &serverPort)
+{
+    myServerAddress = serverAddress;
+    myServerPort = serverPort;
+    connect_to_server();
+}
 void cClient::connect_to_server()
 {
     auto pf = std::bind(
@@ -98,4 +94,10 @@ void cClient::run()
         std::bind(
             &inputHandler, this));
     waiter.run();
+}
+
+void cClient::send(
+    const std::string &msg)
+{
+    tcpex.send(msg);
 }
