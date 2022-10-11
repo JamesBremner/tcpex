@@ -25,7 +25,7 @@ void parse_command_line_options(int argc, char *argv[])
         exit(1);
     }
 }
-
+/// @brief blocking wait for complete line from keyboard
 void key()
 {
     char name[1024];
@@ -34,6 +34,7 @@ void key()
     myString = name + std::string("\n");
 }
 
+/// @brief handle input from keyboard by sending to server, then waiting for another line
 void inputHandler()
 {
     // user has typed something - send it to the server
@@ -49,7 +50,7 @@ void inputHandler()
             &inputHandler));
 }
 
-
+/// @brief  get first input line from keyboard
 void run()
 {
     waiter(

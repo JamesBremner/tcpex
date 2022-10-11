@@ -44,6 +44,26 @@
             }
         },
         {
+            "label": "echo_server_console",
+            "options": {
+                "cwd": "${workspaceFolder}"
+               },
+            "command": "mingw32-make.exe",
+            "args": [
+                "-f",
+                ".vscode/makefile",
+                "echo_server_console"
+            ],
+
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
             "label": "clean",
             "options": {
                 "cwd": "${workspaceFolder}"

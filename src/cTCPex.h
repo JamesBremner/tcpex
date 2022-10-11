@@ -9,7 +9,7 @@ namespace raven
     namespace set
     {
 
-        /// A TCP server handling multiple clients simultaineously
+        /// A C++ wrapper for windows TCP sockets
 
         class cTCPex
         {
@@ -33,7 +33,7 @@ namespace raven
             /// @param server_port 
             /// @param readHandler 
             /// @return true if connected
-            
+
             bool connect_to_server(
                 const std::string &server_address,
                 const std::string &server_port,
@@ -43,6 +43,7 @@ namespace raven
 
              @param[in] ServerPort listens for clients
              @param[in] eventHandler handler to call when something happens
+             @param[in] process handler to call when message arrives from client
              @param[in] maxClient max number of clients, default 1
 
              Starts listening for client connection requests.
@@ -79,7 +80,7 @@ namespace raven
 
              */
 
-            void start(
+            void start_server(
                 const std::string &ServerPort,
                 eventHandler_t eventHandler,
                 processor_t processor,

@@ -98,7 +98,7 @@ namespace raven
         }
         
 
-        void cTCPex::start(
+        void cTCPex::start_server(
             const std::string &ServerPort,
             eventHandler_t readHandler,
             processor_t processor,

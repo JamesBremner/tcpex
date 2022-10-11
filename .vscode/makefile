@@ -25,9 +25,12 @@ OBJ_client_console = \
 	$(ODIR)/client_console_tcpex.o \
 	$(ODIR)/cTCPex.o \
 
-# sources
 OBJ_client_gui = \
 	$(ODIR)/client_gui_tcpex.o \
+	$(ODIR)/cTCPex.o \
+
+OBJ_echo_server_console_tcpex = \
+	$(ODIR)/echo_server_console_tcpex.o \
 	$(ODIR)/cTCPex.o \
 
 ### COMPILE
@@ -42,6 +45,10 @@ client_console: $(OBJ_client_console)
 
 client_gui: $(OBJ_client_gui)
 	g++ -o bin/client_gui.exe \
+	$^ $(static_link_flags) $(LIBS)
+
+echo_server_console: $(OBJ_echo_server_console_tcpex)
+	g++ -o bin/server_echo_console_tcpex.exe \
 	$^ $(static_link_flags) $(LIBS)
 
 .PHONY: clean
