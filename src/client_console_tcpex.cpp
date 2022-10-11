@@ -1,14 +1,102 @@
-#include "cClient.h"
+#include "cCommandParser.h"
+#include "await.h"
+#include "cTCPex.h"
+
+std::string myServerAddress;
+std::string myServerPort;
+std::string myString;
+raven::await::cAwait waiter;
+raven::set::cTCPex tcpex;
+
+void parse_command_line_options(int argc, char *argv[])
+{
+    raven::set::cCommandParser P;
+    P.add("a", "address of server");
+    P.add("p", "port where server listens for clients");
+
+    P.parse(argc, argv);
+
+    myServerAddress = P.value("a");
+    myServerPort = P.value("p");
+
+    if (myServerAddress.empty() || myServerPort.empty())
+    {
+        P.describe();
+        exit(1);
+    }
+}
+
+void key()
+{
+    char name[1024];
+    std::cout << "type something: ";
+    std::cin.getline(name, 1024);
+    myString = name + std::string("\n");
+}
+
+void inputHandler()
+{
+    // user has typed something - send it to the server
+    tcpex.send(myString);
+
+    // std::cout << theCIN.myString;
+
+    // wait for more typing
+    waiter(
+        std::bind(
+            &key),
+        std::bind(
+            &inputHandler));
+}
+
+
+void run()
+{
+    waiter(
+        std::bind(
+            &key),
+        std::bind(
+            &inputHandler));
+    waiter.run();
+}
+
+std::string msgProcessor(
+    int client,
+    const std::string &msg)
+{
+    std::cout << msg;
+    return "";
+}
+
+void connect_to_server() {
+
+    auto pf = std::bind(
+        &msgProcessor,
+        std::placeholders::_1,
+        std::placeholders::_2);
+
+    while (1)
+    {
+        if (tcpex.connect_to_server(
+                myServerAddress,
+                myServerPort,
+                pf))
+            break;
+        std::this_thread::sleep_for(
+            std::chrono::seconds(1));
+    }
+    std::cout << "connected to server\n";
+}
+
 
 main(int argc, char *argv[])
 {
-    cClient C;
-    
-    C.parse_command_line_options(argc,argv);
 
-    C.connect_to_server();
+    parse_command_line_options(argc,argv);
 
-    C.run();
+    connect_to_server();
+
+    run();
 
     return 0;
 }

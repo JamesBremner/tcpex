@@ -1,7 +1,7 @@
 
 #include <wex.h>
 #include "cStarterGUI.h"
-#include "cClient.h"
+#include "cTCPex.h"
 
 class cGUI : public cStarterGUI
 {
@@ -32,27 +32,34 @@ public:
         ebServerPort.text("27678");
         lbStatus.move(50, 180, 300, 50);
         lbStatus.text("");
-        lbSend.move(50,250,70,30);
+        lbSend.move(50, 250, 70, 30);
         lbSend.text("Message");
-        ebSend.move(150,250,150,30);
+        ebSend.move(150, 250, 150, 30);
         ebSend.text("");
-        bnSend.move(320,250,100,30);
+        bnSend.move(320, 250, 100, 30);
         bnSend.text("SEND");
 
         bnConnect.events().click(
             [this]
             {
-                myClient.connect_to_server(
-                    ebServerAddress.text(),
-                    ebServerPort.text());
-                status("Connected to server");
+                auto pf = std::bind(
+                    &msgProcessor, this,
+                    std::placeholders::_1,
+                    std::placeholders::_2);
+                if (!tcpex.connect_to_server(
+                        ebServerAddress.text(),
+                        ebServerPort.text(),
+                        pf))
+                    status("NOT Connected to server");
+                else
+                    status("Connected to server");
             });
 
         bnSend.events().click(
             [this]
             {
-                myClient.send(
-                    ebSend.text() + "\n" );
+                tcpex.send(
+                    ebSend.text() + "\n");
             });
 
         show();
@@ -63,6 +70,14 @@ public:
     {
         lbStatus.text(msg);
         lbStatus.update();
+    }
+
+    std::string msgProcessor(
+        int client,
+        const std::string &msg)
+    {
+        std::cout << msg;
+        return "";
     }
 
 private:
@@ -76,7 +91,7 @@ private:
     wex::editbox &ebSend;
     wex::button &bnSend;
 
-    cClient myClient;
+    raven::set::cTCPex tcpex;
 };
 
 main()
