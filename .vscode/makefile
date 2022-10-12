@@ -37,6 +37,10 @@ OBJ_server_echo_gui_tcpex = \
 	$(ODIR)/server_echo_gui_tcpex.o \
 	$(ODIR)/cTCPex.o \
 
+OBJ_server_job_gui_tcpex = \
+	$(ODIR)/server_job_gui_tcpex.o \
+	$(ODIR)/cTCPex.o \
+
 ### COMPILE
 
 $(ODIR)/%.o: %.cpp  
@@ -57,6 +61,10 @@ server_echo_console: $(OBJ_server_echo_console_tcpex)
 
 server_echo_gui: $(OBJ_server_echo_gui_tcpex)
 	g++ -o bin/server_echo_gui.exe \
+	$^ $(static_link_flags) $(LIBS)
+
+server_job_gui: $(OBJ_server_job_gui_tcpex)
+	g++ -o bin/server_job_gui.exe \
 	$^ $(static_link_flags) $(LIBS)
 
 .PHONY: clean
