@@ -8,5 +8,6 @@ Demo programs
 - `client_gui` Connects to server.  Sand lines to server on button click.  Displays server replies.
 - `server_echo_console`  Accepts single client connection.  Echoes messages received back to client.
 - `server_echo_gui` Accepts single client connection.  Displays and echoes messages received back to client.
+- `server_job_gui` Accepts multiple clients.  Performs jobs of specified duration.  Option to process jobs in one shared thread or in seperate threads for each client.
 
 
