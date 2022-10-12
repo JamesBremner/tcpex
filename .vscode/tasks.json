@@ -44,7 +44,7 @@
             }
         },
         {
-            "label": "echo_server_console",
+            "label": "server_echo_console",
             "options": {
                 "cwd": "${workspaceFolder}"
                },
@@ -52,7 +52,27 @@
             "args": [
                 "-f",
                 ".vscode/makefile",
-                "echo_server_console"
+                "server_echo_console"
+            ],
+
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "server_echo_gui",
+            "options": {
+                "cwd": "${workspaceFolder}"
+               },
+            "command": "mingw32-make.exe",
+            "args": [
+                "-f",
+                ".vscode/makefile",
+                "server_echo_gui"
             ],
 
             "problemMatcher": [
