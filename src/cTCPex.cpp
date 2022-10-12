@@ -3,12 +3,15 @@
 #include <thread>
 #include "cTCPex.h"
 
+// #define VERBOSE
+
 namespace raven
 {
     namespace set
     {
 
-        cTCPex::cTCPex()
+        cTCPex::cTCPex() 
+        : myEventHandler( [](int, eEvent, const std::string &){} )
         {
             myFrameLines = true;
             myConnectSocket.resize(1, INVALID_SOCKET);
@@ -19,6 +22,7 @@ namespace raven
             const std::string &server_port,
             processor_t readHandler)
         {
+            myProcessor = readHandler;
 
             if (server_port.empty())
                 throw std::runtime_error("Server not configured");
@@ -93,6 +97,9 @@ namespace raven
                         "connect failed error: " << std::to_string(err);
                     return false;
             }
+
+            std::thread t(readBlock, this, 0);
+            t.detach();
 
             return true;
         }
@@ -183,6 +190,11 @@ namespace raven
                 if (line.empty())
                     continue;
 
+#ifdef VERBOSE
+                std::cout << "Client " << client
+                    << " sent " << line << "\n";
+#endif
+
                 // invoke handler with message from client
                 myEventHandler(
                     client,
@@ -246,7 +258,9 @@ namespace raven
             }
 
             msg_acc += msg;
+#ifdef VERBOSE
             std::cout << "msg_acc " << msg_acc << "\n";
+#endif
             int p = msg_acc.find_first_of("\n\r");
             if (p == -1)
                 return "";
@@ -523,10 +537,13 @@ namespace raven
         {
             if (myConnectSocket[client] == INVALID_SOCKET)
                 throw std::runtime_error("send on invalid socket");
-            ::send(
+            if( ::send(
                 myConnectSocket[client],
                 msg.c_str(),
-                (int)msg.length(), 0);
+                (int)msg.length(), 0)
+                == SOCKET_ERROR )
+                    std::cout << "cTCPex::send error on "
+                        << msg << "\n";
         }
         void cTCPex::send(
             const std::vector<unsigned char> &msg,

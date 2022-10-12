@@ -65,35 +65,35 @@ std::string msgProcessor(
     int client,
     const std::string &msg)
 {
-    std::cout << msg;
+    std::cout <<"\nfrom server: " <<msg << "\n";
     return "";
 }
 
-void connect_to_server() {
-
-    auto pf = std::bind(
-        &msgProcessor,
-        std::placeholders::_1,
-        std::placeholders::_2);
-
+void connect_to_server()
+{
+    // loop until connection made
     while (1)
     {
         if (tcpex.connect_to_server(
                 myServerAddress,
                 myServerPort,
-                pf))
+                std::bind(
+                    &msgProcessor,
+                    std::placeholders::_1,
+                    std::placeholders::_2)))
             break;
+
+        //connection failed, wait 1 second then try again
         std::this_thread::sleep_for(
             std::chrono::seconds(1));
     }
     std::cout << "connected to server\n";
 }
 
-
 main(int argc, char *argv[])
 {
 
-    parse_command_line_options(argc,argv);
+    parse_command_line_options(argc, argv);
 
     connect_to_server();
 

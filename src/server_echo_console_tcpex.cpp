@@ -40,6 +40,7 @@ std::string msgHandler(
     const std::string &msg)
 {
     std::cout << "FROM SERVER: " << msg << "\n";
+    tcpex.send("REPLY: " + msg );
     return msg;
 }
 

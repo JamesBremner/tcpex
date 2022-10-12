@@ -1,7 +1,7 @@
+#include <winsock2.h>
 #include <vector>
 #include <functional>
 #include <queue>
-#include <winsock2.h>
 #include <ws2tcpip.h>
 
 namespace raven

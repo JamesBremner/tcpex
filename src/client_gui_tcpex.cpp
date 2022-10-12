@@ -77,6 +77,7 @@ public:
         const std::string &msg)
     {
         std::cout << msg;
+        status("server: "+msg);
         return "";
     }
 
