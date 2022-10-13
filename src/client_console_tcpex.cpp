@@ -1,11 +1,10 @@
+#include <thread>
 #include "cCommandParser.h"
-#include "await.h"
 #include "cTCPex.h"
 
 std::string myServerAddress;
 std::string myServerPort;
-std::string myString;
-raven::await::cAwait waiter;
+
 raven::set::cTCPex tcpex;
 
 void parse_command_line_options(int argc, char *argv[])
@@ -25,56 +24,43 @@ void parse_command_line_options(int argc, char *argv[])
         exit(1);
     }
 }
-/// @brief blocking wait for complete line from keyboard
-void key()
-{
-    char name[1024];
-    std::cout << "type something: ";
-    std::cin.getline(name, 1024);
-    myString = name + std::string("\n");
-}
 
 /// @brief handle input from keyboard by sending to server, then waiting for another line
 void inputHandler()
 {
-    // user has typed something - send it to the server
-    tcpex.send(myString);
+    char name[1024];
+    std::string myString;
 
-    // std::cout << theCIN.myString;
+    while (1)
+    {
+        if (!myString.empty())
+        {
+            // user has typed something - send it to the server
+            tcpex.send(myString);
 
-    // wait for more typing
-    waiter(
-        std::bind(
-            &key),
-        std::bind(
-            &inputHandler));
-}
+            // std::cout << theCIN.myString;
+        }
 
-/// @brief  get first input line from keyboard
-void run()
-{
-    waiter(
-        std::bind(
-            &key),
-        std::bind(
-            &inputHandler));
-    waiter.run();
+        // wait for more typing
+        std::cout << "type something: ";
+        std::cin.getline(name, 1024);
+        myString = name + std::string("\n");
+    }
 }
 
 std::string msgProcessor(
     int client,
     const std::string &msg)
 {
-    std::cout <<"\nfrom server: " <<msg << "\n";
+    std::cout << "\nfrom server: " << msg << "\n";
     return "";
 }
 void eventProcessor(
     int client,
     raven::set::cTCPex::eEvent type,
-    const std::string& msg)
-    {
-
-    }
+    const std::string &msg)
+{
+}
 
 void connect_to_server()
 {
@@ -95,7 +81,7 @@ void connect_to_server()
                     std::placeholders::_2)))
             break;
 
-        //connection failed, wait 1 second then try again
+        // connection failed, wait 1 second then try again
         std::this_thread::sleep_for(
             std::chrono::seconds(1));
     }
@@ -109,7 +95,7 @@ main(int argc, char *argv[])
 
     connect_to_server();
 
-    run();
+    inputHandler();
 
     return 0;
 }
