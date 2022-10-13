@@ -88,89 +88,14 @@ void connect_to_server()
     std::cout << "connected to server\n";
 }
 
-#include <list>
-using namespace std;
-
-class Graph
-{
-public:
-    // each node has its own adjacency list
-    map<int, list<int>> adj;
-    // checking if each node has been visited or not
-    vector<bool> visited;
-
-    void addEdge(int n1, int n2);
-
-    void DFS(int v, int w);
-};
-
-void Graph::addEdge(int n1, int n2)
-{
-    // add each other to their own adjacency list
-    adj[n1].push_back(n2);
-    adj[n2].push_back(n1);
-
-    visited.resize( adj.size(), false );
-
-}
-
-void Graph::DFS(int par, int cur)
-{
-
-    // mark current node as visited
-    visited[cur] = true;
-
-    cout << "DFS " << cur << "\n";
-
-    // for each node adjacent
-    for (auto &i : adj[cur])
-    {
-        // check for back edges just once
-        if (i < cur)
-        {
-            //  if it has been visited and it is not the parent node (detects a cycle)
-            if (visited[i] && i != par)
-            {
-                cout << "Back edge " << cur << " " << i << "\n";
-                cout << "Cycle detected! | ";
-                cout << "Adjacent node: " << i << " | ";
-                cout << "Parent node: " << par << "\n";
-            }
-        }
-
-        // run DFS from unvisited node
-        if (!visited[i])
-        {
-            DFS(cur, i);
-        }
-    }
-}
-
-void test()
-{
-    // create graph
-    Graph graph;
-    graph.addEdge(0, 1);
-    graph.addEdge(1, 2);
-    graph.addEdge(1, 3);
-    graph.addEdge(2, 5);
-    graph.addEdge(2, 3);
-    graph.addEdge(3, 4);
-    graph.addEdge(4, 6);
-
-    // run DFS on the first node
-    graph.DFS(0, 0);
-}
 
 main(int argc, char *argv[])
 {
-    test();
+    parse_command_line_options(argc, argv);
 
-    // parse_command_line_options(argc, argv);
+    connect_to_server();
 
-    // connect_to_server();
+    inputHandler();
 
-    // inputHandler();
-
-    // return 0;
+    return 0;
 }
