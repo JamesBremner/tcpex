@@ -7,14 +7,13 @@
             "label": "client_console",
             "options": {
                 "cwd": "${workspaceFolder}"
-               },
+            },
             "command": "mingw32-make.exe",
             "args": [
                 "-f",
                 ".vscode/makefile",
                 "client_console"
             ],
-
             "problemMatcher": [
                 "$gcc"
             ],
@@ -27,14 +26,13 @@
             "label": "client_gui",
             "options": {
                 "cwd": "${workspaceFolder}"
-               },
+            },
             "command": "mingw32-make.exe",
             "args": [
                 "-f",
                 ".vscode/makefile",
                 "client_gui"
             ],
-
             "problemMatcher": [
                 "$gcc"
             ],
@@ -47,14 +45,13 @@
             "label": "server_echo_console",
             "options": {
                 "cwd": "${workspaceFolder}"
-               },
+            },
             "command": "mingw32-make.exe",
             "args": [
                 "-f",
                 ".vscode/makefile",
                 "server_echo_console"
             ],
-
             "problemMatcher": [
                 "$gcc"
             ],
@@ -67,14 +64,13 @@
             "label": "server_echo_gui",
             "options": {
                 "cwd": "${workspaceFolder}"
-               },
+            },
             "command": "mingw32-make.exe",
             "args": [
                 "-f",
                 ".vscode/makefile",
                 "server_echo_gui"
             ],
-
             "problemMatcher": [
                 "$gcc"
             ],
@@ -87,14 +83,13 @@
             "label": "server_job_gui",
             "options": {
                 "cwd": "${workspaceFolder}"
-               },
+            },
             "command": "mingw32-make.exe",
             "args": [
                 "-f",
                 ".vscode/makefile",
                 "server_job_gui"
             ],
-
             "problemMatcher": [
                 "$gcc"
             ],
@@ -107,14 +102,13 @@
             "label": "bbserver",
             "options": {
                 "cwd": "${workspaceFolder}"
-               },
+            },
             "command": "mingw32-make.exe",
             "args": [
                 "-f",
                 ".vscode/makefile",
                 "bbserver"
             ],
-
             "problemMatcher": [
                 "$gcc"
             ],
@@ -127,14 +121,13 @@
             "label": "clean",
             "options": {
                 "cwd": "${workspaceFolder}"
-               },
+            },
             "command": "mingw32-make.exe",
             "args": [
                 "-f",
                 ".vscode/makefile",
                 "clean"
             ],
-
             "problemMatcher": [
                 "$gcc"
             ],
@@ -142,7 +135,19 @@
                 "kind": "build",
                 "isDefault": false
             }
+        },
+        {
+            "label": "Build ALL",
+            "dependsOn": [
+                "clean",
+                "client_console",
+                "client_gui",
+                "server_echo_console",
+                "server_echo_gui",
+                "server_job_gui",
+                "bbserver"
+            ],
+            "problemMatcher": []
         }
-
     ]
 }

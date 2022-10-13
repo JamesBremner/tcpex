@@ -37,6 +37,7 @@ namespace raven
             bool connect_to_server(
                 const std::string &server_address,
                 const std::string &server_port,
+                eventHandler_t eventHandler,
                 processor_t readHandler);
 
             /** start server
@@ -182,7 +183,7 @@ namespace raven
             /// @brief Construct socket that listens for client connetion requests
             void acceptSocketCtor();
 
-            /** Accumulate complete lines ( terminated by \n or \t pt \m\r )
+            /** Accumulate complete lines ( terminated by \n or \r or \n\r )
              * @param msg message received
              * @return line received, "" if no line available
              */

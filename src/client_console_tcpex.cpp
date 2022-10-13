@@ -68,6 +68,13 @@ std::string msgProcessor(
     std::cout <<"\nfrom server: " <<msg << "\n";
     return "";
 }
+void eventProcessor(
+    int client,
+    raven::set::cTCPex::eEvent type,
+    const std::string& msg)
+    {
+
+    }
 
 void connect_to_server()
 {
@@ -77,6 +84,11 @@ void connect_to_server()
         if (tcpex.connect_to_server(
                 myServerAddress,
                 myServerPort,
+                std::bind(
+                    &eventProcessor,
+                    std::placeholders::_1,
+                    std::placeholders::_2,
+                    std::placeholders::_3),
                 std::bind(
                     &msgProcessor,
                     std::placeholders::_1,

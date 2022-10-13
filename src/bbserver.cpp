@@ -243,7 +243,7 @@ std::string cServer::clientMsgProcessor(
         else
             M.sender = it->second;
         myLastID = M.write();
-        return "3.0 WROTE " + std::to_string(myLastID);
+        return "3.0 WROTE " + std::to_string(myLastID) + "\n";
     }
 
     case eCommand::user:
@@ -252,7 +252,7 @@ std::string cServer::clientMsgProcessor(
             std::make_pair(
                 std::to_string(client),
                 cmdtext));
-        return "1.0 HELLO " + cmdtext;
+        return "1.0 HELLO " + cmdtext + "\n";
 
     case eCommand::read:
     {

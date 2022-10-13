@@ -3,7 +3,7 @@
 #include <thread>
 #include "cTCPex.h"
 
-// #define VERBOSE
+ #define VERBOSE
 
 namespace raven
 {
@@ -20,8 +20,10 @@ namespace raven
         bool cTCPex::connect_to_server(
             const std::string &server_address,
             const std::string &server_port,
+            eventHandler_t eventHandler,
             processor_t readHandler)
         {
+            myEventHandler = eventHandler,
             myProcessor = readHandler;
 
             if (server_port.empty())
@@ -269,6 +271,10 @@ namespace raven
             std::string ret = msg_acc.substr(0, p) + "\n";
             msg_acc = msg_acc.substr(
                 msg_acc.find_last_of("\n\r") + 1);
+
+#ifdef VERBOSE
+            std::cout << "complete line.  msg_acc " << msg_acc << "\n";
+#endif
             return ret;
         }
 
@@ -544,6 +550,11 @@ namespace raven
                 == SOCKET_ERROR )
                     std::cout << "cTCPex::send error on "
                         << msg << "\n";
+#ifdef VERBOSE
+            else
+                std::cout << "cTCPex:send sent "
+                    << msg << "\n";
+#endif
         }
         void cTCPex::send(
             const std::vector<unsigned char> &msg,

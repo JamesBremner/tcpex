@@ -42,14 +42,18 @@ public:
         bnConnect.events().click(
             [this]
             {
-                auto pf = std::bind(
-                    &msgProcessor, this,
-                    std::placeholders::_1,
-                    std::placeholders::_2);
                 if (!tcpex.connect_to_server(
                         ebServerAddress.text(),
                         ebServerPort.text(),
-                        pf))
+                        std::bind(
+                            &eventHandler, this,
+                            std::placeholders::_1,
+                            std::placeholders::_2,
+                            std::placeholders::_3),
+                        std::bind(
+                            &msgProcessor, this,
+                            std::placeholders::_1,
+                            std::placeholders::_2)))
                     status("NOT Connected to server");
                 else
                     status("Connected to server");
@@ -68,8 +72,24 @@ public:
 
     void status(const std::string &msg)
     {
-        lbStatus.text(msg);
+        int pc = 100 - msg.size();
+        std::string m(msg);
+        for (int k = 0; k < pc; k++)
+            m.push_back(' ');
+        lbStatus.text(m);
         lbStatus.update();
+    }
+    void eventHandler(
+        int client,
+        raven::set::cTCPex::eEvent type,
+        const std::string &msg)
+    {
+        switch (type)
+        {
+        case raven::set::cTCPex::eEvent::disconnect:
+            status("Disconnected from server");
+            break;
+        }
     }
 
     std::string msgProcessor(
@@ -77,7 +97,7 @@ public:
         const std::string &msg)
     {
         std::cout << msg;
-        status("server: "+msg);
+        status("server: " + msg);
         return "";
     }
 
