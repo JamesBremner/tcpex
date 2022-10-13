@@ -100,6 +100,7 @@ namespace raven
                     return false;
             }
 
+            // wait for messages from server in a new thread.
             std::thread t(readBlock, this, 0);
             t.detach();
 

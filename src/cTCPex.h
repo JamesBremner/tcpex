@@ -28,11 +28,18 @@ namespace raven
 
             cTCPex();
 
-            /// @brief Connect to server
+            /** Connect to server
             /// @param server_address 
             /// @param server_port 
             /// @param readHandler 
             /// @return true if connected
+
+            This blocks until the server accepts the connection.
+
+            A new thread is started that waits for messages from the server.
+            The thread runs until the app exits - app code must keep the app runing.
+            When a message arrives, the handler runs in this thread.
+            */
 
             bool connect_to_server(
                 const std::string &server_address,
