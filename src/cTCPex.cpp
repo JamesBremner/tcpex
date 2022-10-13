@@ -260,12 +260,20 @@ namespace raven
             }
 
             msg_acc += msg;
+
 #ifdef VERBOSE
             std::cout << "msg_acc " << msg_acc << "\n";
 #endif
+
+            // check for complete valid line
             int p = msg_acc.find_first_of("\n\r");
             if (p == -1)
                 return "";
+            if( msg_acc.find_first_not_of("\n\r") == -1)
+            {
+                msg_acc.clear();
+                return ""
+            }
 
             // complete line received
             std::string ret = msg_acc.substr(0, p) + "\n";

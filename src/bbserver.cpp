@@ -221,6 +221,10 @@ void cServer::eventHandler(
     case raven::set::cTCPex::eEvent::accept:
         myTCPServer.send("0.0 greeting\n", client);
         break;
+    case raven::set::cTCPex::eEvent::disconnect:
+        std::cout << "disconnect event client " << client << "\n";
+        
+        break;
     }
 }
 
