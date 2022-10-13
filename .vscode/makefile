@@ -41,8 +41,12 @@ OBJ_server_job_gui_tcpex = \
 	$(ODIR)/server_job_gui_tcpex.o \
 	$(ODIR)/cTCPex.o \
 
-	OBJ_bbserver = \
+OBJ_bbserver = \
 	$(ODIR)/bbserver.o \
+	$(ODIR)/cTCPex.o \
+
+OBJ_server_relay = \
+	$(ODIR)/server_relay_console_tcpex.o \
 	$(ODIR)/cTCPex.o \
 
 ### COMPILE
@@ -74,6 +78,11 @@ server_job_gui: $(OBJ_server_job_gui_tcpex)
 bbserver: $(OBJ_bbserver)
 	g++ -o bin/bbserver.exe \
 	$^ $(static_link_flags) $(LIBS)
+
+server_relay: $(OBJ_server_relay)
+	g++ -o bin/server_relay.exe \
+	$^ $(static_link_flags) $(LIBS)
+
 
 .PHONY: clean
 clean:

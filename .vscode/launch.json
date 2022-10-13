@@ -8,7 +8,7 @@
             "name": "(gdb) Launch",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/bin/bbserver.exe",
+            "program": "${workspaceFolder}/bin/client_console.exe",
             "args": ["--a","127.0.0.1","--p","27678","--b","bb.txt"],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}/bin",

@@ -272,7 +272,7 @@ namespace raven
             if( msg_acc.find_first_not_of("\n\r") == -1)
             {
                 msg_acc.clear();
-                return ""
+                return "";
             }
 
             // complete line received

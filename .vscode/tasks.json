@@ -118,6 +118,25 @@
             }
         },
         {
+            "label": "server_relay",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "command": "mingw32-make.exe",
+            "args": [
+                "-f",
+                ".vscode/makefile",
+                "server_relay"
+            ],
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
             "label": "clean",
             "options": {
                 "cwd": "${workspaceFolder}"
