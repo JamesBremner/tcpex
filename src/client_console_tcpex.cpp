@@ -55,6 +55,9 @@ std::string msgProcessor(
 {
     switch (type)
     {
+    case raven::set::cTCPex::eEvent::accept:
+        std::cout << "Connected\n";
+        break;
     case raven::set::cTCPex::eEvent::read:
         std::cout << "\nfrom server: " << msg << "\n";
         break;
@@ -62,33 +65,18 @@ std::string msgProcessor(
     return "";
 }
 
-void connect_to_server()
-{
-    // loop until connection made
-    while (1)
-    {
-        if (tcpex.connect_to_server(
-                myServerAddress,
-                myServerPort,
-                std::bind(
-                    &msgProcessor,
-                    std::placeholders::_1,
-                    std::placeholders::_2,
-                    std::placeholders::_3)))
-            break;
-
-        // connection failed, wait 1 second then try again
-        std::this_thread::sleep_for(
-            std::chrono::seconds(1));
-    }
-    std::cout << "connected to server\n";
-}
-
 main(int argc, char *argv[])
 {
     parse_command_line_options(argc, argv);
 
-    connect_to_server();
+    tcpex.connect_to_server_wait(
+        myServerAddress,
+        myServerPort,
+        std::bind(
+            &msgProcessor,
+            std::placeholders::_1,
+            std::placeholders::_2,
+            std::placeholders::_3));
 
     inputHandler();
 

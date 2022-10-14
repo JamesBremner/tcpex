@@ -33,9 +33,9 @@ namespace raven
             /// @param eventHandler 
             /// @return true if connected
 
-            This blocks until the server accepts the connection.
+            This blocks until the server accepts the connection, or rejects the connection
 
-            A new thread is started that waits for messages from the server.
+            If connection succesful, a new thread is started that waits for messages from the server.
             The thread runs until the app exits - app code must keep the app runing.
             When a message arrives, the handler runs in this thread.
             */
@@ -44,6 +44,20 @@ namespace raven
                 const std::string &server_address,
                 const std::string &server_port,
                 eventHandler_t eventHandler);
+
+            /** Connect to server, block until success
+            /// @param server_address 
+            /// @param server_port 
+            /// @param eventHandler 
+            /// @param timoutSecs 0 for wait forever ( 0 is default )
+            /// @return true if succesful
+            */
+
+            bool connect_to_server_wait(
+                const std::string &server_address,
+                const std::string &server_port,
+                eventHandler_t eventHandler,
+                int timoutSecs = 0 );
 
             /** start server
 

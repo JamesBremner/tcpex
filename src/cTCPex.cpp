@@ -3,19 +3,50 @@
 #include <thread>
 #include "cTCPex.h"
 
- #define VERBOSE
+#define VERBOSE
 
 namespace raven
 {
     namespace set
     {
 
-        cTCPex::cTCPex() 
-        : myEventHandler( [](int, eEvent, const std::string &){return "";} ),
-        mySharedProcessingThread( false ),
-        myFrameLines( true )
+        cTCPex::cTCPex()
+            : myEventHandler([](int, eEvent, const std::string &)
+                             { return ""; }),
+              mySharedProcessingThread(false),
+              myFrameLines(true)
         {
             myConnectSocket.resize(1, INVALID_SOCKET);
+        }
+
+        bool cTCPex::connect_to_server_wait(
+            const std::string &server_address,
+            const std::string &server_port,
+            eventHandler_t eventHandler,
+            int timoutSecs)
+        {
+            // loop until connection made
+            int count = 0;
+            while (1)
+            {
+                if (connect_to_server(
+                        server_address,
+                        server_port,
+                        eventHandler))
+                    break;
+
+                // connection failed, wait 1 second then try again
+                std::this_thread::sleep_for(
+                    std::chrono::seconds(1));
+
+                // check for timeout
+                if (timoutSecs)
+                {
+                    if (count++ > timoutSecs)
+                        return false;
+                }
+            }
+            return true;
         }
 
         bool cTCPex::connect_to_server(
@@ -71,8 +102,8 @@ namespace raven
             catch (std::runtime_error &e)
             {
                 std::cout << server_address << ":" << myServerPort
-                    << " socket connect threw exception";
-                    connect_return = SOCKET_ERROR;
+                          << " socket connect threw exception";
+                connect_return = SOCKET_ERROR;
             }
             if (connect_return == SOCKET_ERROR)
             {
@@ -94,9 +125,8 @@ namespace raven
                     return false;
                 }
                 else
-                    std::cout <<
-                        "connect failed error: " << std::to_string(err);
-                    return false;
+                    std::cout << "connect failed error: " << std::to_string(err);
+                return false;
             }
 
             // wait for messages from server in a new thread.
@@ -105,7 +135,6 @@ namespace raven
 
             return true;
         }
-        
 
         void cTCPex::start_server(
             const std::string &ServerPort,
@@ -192,7 +221,7 @@ namespace raven
 
 #ifdef VERBOSE
                 std::cout << "Client " << client
-                    << " sent " << line << "\n";
+                          << " sent " << line << "\n";
 #endif
 
                 if (mySharedProcessingThread)
@@ -266,7 +295,7 @@ namespace raven
             int p = msg_acc.find_first_of("\n\r");
             if (p == -1)
                 return "";
-            if( msg_acc.find_first_not_of("\n\r") == -1)
+            if (msg_acc.find_first_not_of("\n\r") == -1)
             {
                 msg_acc.clear();
                 return "";
@@ -546,21 +575,28 @@ namespace raven
             const std::string &msg,
             int client)
         {
+            if (msg.empty())
+            {
+#ifdef VERBOSE
+                std::cout << "cTCPex:send ignored empty msg\n";
+#endif
+                return;
+            }
             if (myConnectSocket[client] == INVALID_SOCKET)
                 throw std::runtime_error("send on invalid socket");
-            if( ::send(
-                myConnectSocket[client],
-                msg.c_str(),
-                (int)msg.length(), 0)
-                == SOCKET_ERROR )
-                    std::cout << "cTCPex::send error on "
-                        << msg << "\n";
+            if (::send(
+                    myConnectSocket[client],
+                    msg.c_str(),
+                    (int)msg.length(), 0) == SOCKET_ERROR)
+                std::cout << "cTCPex::send error on "
+                          << msg << "\n";
 #ifdef VERBOSE
             else
                 std::cout << "cTCPex:send sent "
-                    << msg << "\n";
+                          << msg << "\n";
 #endif
         }
+
         void cTCPex::send(
             const std::vector<unsigned char> &msg,
             int client)
