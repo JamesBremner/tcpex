@@ -49,11 +49,7 @@ public:
                             &eventHandler, this,
                             std::placeholders::_1,
                             std::placeholders::_2,
-                            std::placeholders::_3),
-                        std::bind(
-                            &msgProcessor, this,
-                            std::placeholders::_1,
-                            std::placeholders::_2)))
+                            std::placeholders::_3)))
                     status("NOT Connected to server");
                 else
                     status("Connected to server");
@@ -79,25 +75,23 @@ public:
         lbStatus.text(m);
         lbStatus.update();
     }
-    void eventHandler(
+    std::string eventHandler(
         int client,
         raven::set::cTCPex::eEvent type,
         const std::string &msg)
     {
         switch (type)
         {
+        case raven::set::cTCPex::eEvent::accept:
+            status("Connected to server");
+            break;
         case raven::set::cTCPex::eEvent::disconnect:
             status("Disconnected from server");
             break;
+        case raven::set::cTCPex::eEvent::read:
+            status("server: " + msg);
+            break;
         }
-    }
-
-    std::string msgProcessor(
-        int client,
-        const std::string &msg)
-    {
-        std::cout << msg;
-        status("server: " + msg);
         return "";
     }
 

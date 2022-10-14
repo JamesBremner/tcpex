@@ -59,27 +59,27 @@ client_console: $(OBJ_client_console)
 	g++ -o bin/client_console.exe \
 	$^ $(static_link_flags) $(LIBS)
 
-client_gui: $(OBJ_client_gui)
+client_gui: $(OBJ_client_gui) cTCPex.h
 	g++ -o bin/client_gui.exe \
 	$^ $(static_link_flags) $(LIBS)
 
-server_echo_console: $(OBJ_server_echo_console_tcpex)
+server_echo_console: $(OBJ_server_echo_console_tcpex) cTCPex.h
 	g++ -o bin/server_echo_console.exe \
 	$^ $(static_link_flags) $(LIBS)
 
-server_echo_gui: $(OBJ_server_echo_gui_tcpex)
+server_echo_gui: $(OBJ_server_echo_gui_tcpex) cTCPex.h
 	g++ -o bin/server_echo_gui.exe \
 	$^ $(static_link_flags) $(LIBS)
 
-server_job_gui: $(OBJ_server_job_gui_tcpex)
+server_job_gui: $(OBJ_server_job_gui_tcpex) cTCPex.h
 	g++ -o bin/server_job_gui.exe \
 	$^ $(static_link_flags) $(LIBS)
 
-bbserver: $(OBJ_bbserver)
+bbserver: $(OBJ_bbserver) cTCPex.h
 	g++ -o bin/bbserver.exe \
 	$^ $(static_link_flags) $(LIBS)
 
-server_relay: $(OBJ_server_relay)
+server_relay: $(OBJ_server_relay) cTCPex.h
 	g++ -o bin/server_relay.exe \
 	$^ $(static_link_flags) $(LIBS)
 

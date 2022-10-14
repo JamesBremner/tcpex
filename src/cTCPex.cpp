@@ -11,20 +11,19 @@ namespace raven
     {
 
         cTCPex::cTCPex() 
-        : myEventHandler( [](int, eEvent, const std::string &){} )
+        : myEventHandler( [](int, eEvent, const std::string &){return "";} ),
+        mySharedProcessingThread( false ),
+        myFrameLines( true )
         {
-            myFrameLines = true;
             myConnectSocket.resize(1, INVALID_SOCKET);
         }
 
         bool cTCPex::connect_to_server(
             const std::string &server_address,
             const std::string &server_port,
-            eventHandler_t eventHandler,
-            processor_t readHandler)
+            eventHandler_t eventHandler)
         {
-            myEventHandler = eventHandler,
-            myProcessor = readHandler;
+            myEventHandler = eventHandler;
 
             if (server_port.empty())
                 throw std::runtime_error("Server not configured");
@@ -110,14 +109,12 @@ namespace raven
 
         void cTCPex::start_server(
             const std::string &ServerPort,
-            eventHandler_t readHandler,
-            processor_t processor,
+            eventHandler_t eventHandler,
             int maxClient)
         {
             myServerPort = ServerPort;
             myConnectSocket.resize(maxClient, INVALID_SOCKET);
-            myEventHandler = readHandler;
-            myProcessor = processor;
+            myEventHandler = eventHandler;
 
             // construct socket where server listens for client connection requests
             acceptSocketCtor();
@@ -198,20 +195,18 @@ namespace raven
                     << " sent " << line << "\n";
 #endif
 
-                // invoke handler with message from client
-                myEventHandler(
-                    client,
-                    eEvent::read,
-                    line);
-
                 if (mySharedProcessingThread)
                 {
                     myJobQ.push(cJob(client, line));
                 }
                 else
                 {
+                    // run the evenHandler in this thread
                     send(
-                        myProcessor(client, line),
+                        myEventHandler(
+                            client,
+                            eEvent::read,
+                            line),
                         client);
                 }
             }
@@ -233,8 +228,9 @@ namespace raven
                 // process job at front of queue
                 auto &j = myJobQ.front();
                 send(
-                    myProcessor(
+                    myEventHandler(
                         j.client,
+                        eEvent::read,
                         j.msg),
                     j.client);
                 myJobQ.pop();

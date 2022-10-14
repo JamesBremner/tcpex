@@ -1,4 +1,5 @@
 #include <winsock2.h>
+#include <string>
 #include <vector>
 #include <functional>
 #include <queue>
@@ -21,17 +22,15 @@ namespace raven
                 disconnect,
             };
 
-            typedef std::function<void(int, eEvent, const std::string &)>
+            typedef std::function<std::string(int, eEvent, const std::string &)>
                 eventHandler_t;
-            typedef std::function<std::string(int, const std::string &)>
-                processor_t;
 
             cTCPex();
 
             /** Connect to server
             /// @param server_address 
             /// @param server_port 
-            /// @param readHandler 
+            /// @param eventHandler 
             /// @return true if connected
 
             This blocks until the server accepts the connection.
@@ -44,8 +43,7 @@ namespace raven
             bool connect_to_server(
                 const std::string &server_address,
                 const std::string &server_port,
-                eventHandler_t eventHandler,
-                processor_t readHandler);
+                eventHandler_t eventHandler);
 
             /** start server
 
@@ -91,7 +89,6 @@ namespace raven
             void start_server(
                 const std::string &ServerPort,
                 eventHandler_t eventHandler,
-                processor_t processor,
                 int maxClient = 1);
 
             /// Send message to client
@@ -157,7 +154,6 @@ namespace raven
             std::string myRemoteAddress;
             char myReadbuf[1024];
             eventHandler_t myEventHandler;
-            processor_t myProcessor;
 
             void initWinSock();
 

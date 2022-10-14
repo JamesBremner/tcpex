@@ -158,14 +158,18 @@
         {
             "label": "Build ALL",
             "dependsOn": [
-                "clean",
                 "client_console",
                 "client_gui",
                 "server_echo_console",
                 "server_echo_gui",
                 "server_job_gui",
-                "bbserver"
+                "bbserver",
+                "server_relay"
             ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
             "problemMatcher": []
         }
     ]

@@ -50,16 +50,16 @@ void inputHandler()
 
 std::string msgProcessor(
     int client,
-    const std::string &msg)
-{
-    std::cout << "\nfrom server: " << msg << "\n";
-    return "";
-}
-void eventProcessor(
-    int client,
     raven::set::cTCPex::eEvent type,
     const std::string &msg)
 {
+    switch (type)
+    {
+    case raven::set::cTCPex::eEvent::read:
+        std::cout << "\nfrom server: " << msg << "\n";
+        break;
+    }
+    return "";
 }
 
 void connect_to_server()
@@ -71,14 +71,10 @@ void connect_to_server()
                 myServerAddress,
                 myServerPort,
                 std::bind(
-                    &eventProcessor,
-                    std::placeholders::_1,
-                    std::placeholders::_2,
-                    std::placeholders::_3),
-                std::bind(
                     &msgProcessor,
                     std::placeholders::_1,
-                    std::placeholders::_2)))
+                    std::placeholders::_2,
+                    std::placeholders::_3)))
             break;
 
         // connection failed, wait 1 second then try again
@@ -87,7 +83,6 @@ void connect_to_server()
     }
     std::cout << "connected to server\n";
 }
-
 
 main(int argc, char *argv[])
 {

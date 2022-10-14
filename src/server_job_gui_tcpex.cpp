@@ -61,7 +61,7 @@ private:
         lbStatus.update();
     }
 
-    void eventHandler(
+    std::string eventHandler(
         int client,
         raven::set::cTCPex::eEvent type,
         const std::string &msg)
@@ -70,10 +70,14 @@ private:
         {
         case raven::set::cTCPex::eEvent::accept:
             status("Client Connected");
-            break;
+            return "";
         case raven::set::cTCPex::eEvent::disconnect:
             status("Client disconnected");
-            break;
+            return "";
+        case raven::set::cTCPex::eEvent::read:
+            return processor(client,msg);
+            default:
+            return "";
         }
     }
     /// @brief process message received from client
@@ -101,10 +105,6 @@ void cGUI::start_server()
             std::placeholders::_1,
             std::placeholders::_2,
             std::placeholders::_3),
-        std::bind(
-            &processor, this,
-            std::placeholders::_1,
-            std::placeholders::_2),
         atoi(ebMaxClient.text().c_str()));
     status("Waiting for client connection");
 }

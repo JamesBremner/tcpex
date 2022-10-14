@@ -27,7 +27,7 @@ void parse_command_line_options(int argc, char *argv[])
     }
 }
 
-void eventHandler(
+std::string msgHandler1(
     int client,
     raven::set::cTCPex::eEvent type,
     const std::string &msg)
@@ -36,24 +36,32 @@ void eventHandler(
     {
     case raven::set::cTCPex::eEvent::accept:
         std::cout << client << " client connected\n";
-         break;
+        return "";
+
+        std::cout << "Copy from 1 " << msg << "\n";
+        tcpex2.send("REPLY: " + msg);
+        return msg;
+    default:
+        return "";
     }
-}
-std::string msgHandler1(
-    int client,
-    const std::string &msg)
-{
-    std::cout << "Copy from 1 " << msg << "\n";
-    tcpex2.send("REPLY: " + msg );
-    return msg;
 }
 std::string msgHandler2(
     int client,
+    raven::set::cTCPex::eEvent type,
     const std::string &msg)
 {
-    std::cout << "Copy from 2: " << msg << "\n";
-    tcpex1.send("REPLY: " + msg );
-    return msg;
+    switch (type)
+    {
+    case raven::set::cTCPex::eEvent::accept:
+        std::cout << client << " client connected\n";
+        return "";
+    case raven::set::cTCPex::eEvent::read:
+        std::cout << "Copy from 2: " << msg << "\n";
+        tcpex1.send("REPLY: " + msg);
+        return msg;
+    default:
+        return "";
+    }
 }
 
 main(int argc, char *argv[])
@@ -64,27 +72,19 @@ main(int argc, char *argv[])
     tcpex1.start_server(
         myServerPort1,
         std::bind(
-            &eventHandler,
-            std::placeholders::_1,
-            std::placeholders::_2,
-            std::placeholders::_3),
-        std::bind(
             &msgHandler1,
             std::placeholders::_1,
-            std::placeholders::_2));
+            std::placeholders::_2,
+            std::placeholders::_3));
     tcpex2.start_server(
         myServerPort2,
         std::bind(
-            &eventHandler,
-            std::placeholders::_1,
-            std::placeholders::_2,
-            std::placeholders::_3),
-        std::bind(
             &msgHandler2,
             std::placeholders::_1,
-            std::placeholders::_2));
+            std::placeholders::_2,
+            std::placeholders::_3));
 
-    while( 1 )
+    while (1)
         std::this_thread::sleep_for(std::chrono::seconds(1));
 
     return 0;

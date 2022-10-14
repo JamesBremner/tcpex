@@ -34,10 +34,6 @@ public:
                         std::placeholders::_1,
                         std::placeholders::_2,
                         std::placeholders::_3),
-                    std::bind(
-                        &processor, this,
-                        std::placeholders::_1,
-                        std::placeholders::_2),
                     1);
                 status("Waiting for client connection");
             });
@@ -60,7 +56,7 @@ private:
         lbStatus.update();
     }
 
-    void eventHandler(
+    std::string eventHandler(
         int client,
         raven::set::cTCPex::eEvent type,
         const std::string &msg)
@@ -69,22 +65,15 @@ private:
         {
         case raven::set::cTCPex::eEvent::accept:
             status("Client Connected");
-            break;
+            return "";
         case raven::set::cTCPex::eEvent::disconnect:
             status("Client disconnected");
-            break;
+            return "";
+        case raven::set::cTCPex::eEvent::read:
+            status("Client: " + msg);
+            return msg;
         }
-    }
-    /// @brief Echo message received from client back to client
-    /// @param client 
-    /// @param msg 
-    /// @return 
-    const std::string processor(
-        int client,
-        const std::string &msg)
-    {
-        status("Client: " + msg);
-        return msg;
+        return "";
     }
 };
 
