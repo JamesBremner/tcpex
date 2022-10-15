@@ -225,12 +225,15 @@ namespace raven
 
                 if (mySharedProcessingThread)
                 {
+                    // add to job queue, ready to be run in shared job thread
                     myJobQ.push(cJob(client, line));
                 }
                 else
                 {
                     // run the evenHandler in this thread
+                    e.client = client;
                     e.type = eEvent::read;
+                    e.msg = line;
                     send(
                         myEventHandler( e ),
                         client);
