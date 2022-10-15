@@ -3,6 +3,7 @@
 #include <vector>
 #include <functional>
 #include <queue>
+#include <mutex>
 #include <ws2tcpip.h>
 
 namespace raven
@@ -29,6 +30,7 @@ namespace raven
                 std::string msg;    // msg that generated ( read ) event
             };
 
+            /// @brief event handler function signature
             typedef std::function<std::string(const sEvent& e)>
                 eventHandler_t;
 
@@ -167,11 +169,13 @@ namespace raven
             bool myFrameLines;
             bool mySharedProcessingThread;
             std::string myServerPort;
-            SOCKET myAcceptSocket;               //< socket listening for clients
-            std::vector<SOCKET> myConnectSocket; //< sockets connected to clients
+            SOCKET myAcceptSocket;               ///< socket listening for clients
+            std::vector<SOCKET> myConnectSocket; ///< sockets connected to clients
             std::string myRemoteAddress;
             char myReadbuf[1024];
-            eventHandler_t myEventHandler;
+            eventHandler_t myEventHandler;           
+            std::queue<sEvent> myJobQ;  ///< Queue of jobs waiting to run in SharedProcessingThread
+            std::mutex mtxJobQ;     ///< protect job queue from multi-thread access
 
             void initWinSock();
 
@@ -220,22 +224,7 @@ namespace raven
 
             SOCKET clientSocket(int client);
 
-            class cJob
-            {
-            public:
-                int client;
-                const std::string &msg;
 
-                cJob(int c,
-                     const std::string &m)
-                    : client(c),
-                      msg(m)
-                {
-                }
-            };
-
-            /// @brief Queue of jobs waiting to run in mySharedProcessingThread
-            std::queue<cJob> myJobQ;
         };
 
     }

@@ -1,6 +1,7 @@
 #include <string>
 #include <iostream>
 #include <thread>
+
 #include "cTCPex.h"
 
 #define VERBOSE
@@ -11,7 +12,7 @@ namespace raven
     {
 
         cTCPex::cTCPex()
-            : myEventHandler([](const sEvent& )
+            : myEventHandler([](const sEvent &)
                              { return ""; }),
               mySharedProcessingThread(false),
               myFrameLines(true)
@@ -195,7 +196,7 @@ namespace raven
             e.client = client;
             e.type = eEvent::accept;
             e.msg = "";
-            myEventHandler( e );
+            myEventHandler(e);
 
             while (true)
             {
@@ -207,7 +208,7 @@ namespace raven
                 {
                     // invoke handler with disconnect message
                     e.type = eEvent::disconnect;
-                    myEventHandler( e );
+                    myEventHandler(e);
 
                     // exit ( ends thread )
                     return;
@@ -223,19 +224,21 @@ namespace raven
                           << " sent " << line << "\n";
 #endif
 
+                e.client = client;
+                e.type = eEvent::read;
+                e.msg = line;
+
                 if (mySharedProcessingThread)
                 {
                     // add to job queue, ready to be run in shared job thread
-                    myJobQ.push(cJob(client, line));
+                    std::lock_guard<std::mutex> lck (mtxJobQ);
+                    myJobQ.push(e);
                 }
                 else
                 {
                     // run the evenHandler in this thread
-                    e.client = client;
-                    e.type = eEvent::read;
-                    e.msg = line;
                     send(
-                        myEventHandler( e ),
+                        myEventHandler(e),
                         client);
                 }
             }
@@ -246,7 +249,12 @@ namespace raven
             while (true)
             {
                 // check for waiting job
-                if (myJobQ.empty())
+                bool fqwaiting;
+                {
+                    std::lock_guard<std::mutex> lck (mtxJobQ);
+                    fqwaiting =  myJobQ.size();
+                }
+                if (!fqwaiting)
                 {
                     // let other processes run
                     std::this_thread::sleep_for(
@@ -255,15 +263,15 @@ namespace raven
                 }
 
                 // process job at front of queue
-                auto &j = myJobQ.front();
                 static sEvent e;
-                e.client = j.client;
-                e.type = eEvent::read;
-                e.msg = j.msg;
+                {
+                    std::lock_guard<std::mutex> lck (mtxJobQ);
+                    e = myJobQ.front();
+                    myJobQ.pop();
+                }
                 send(
-                    myEventHandler( e ),
-                    j.client);
-                myJobQ.pop();
+                    myEventHandler(e),
+                    e.client);
             }
         }
 
