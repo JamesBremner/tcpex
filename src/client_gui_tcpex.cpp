@@ -60,32 +60,59 @@ public:
                     ebSend.text() + "\n");
             });
 
+        //Regular check for status update request from another thread
+        myUpdateTimer = new wex::timer(fm, 200);
+        fm.events().timer([this](int id)
+                          { StatusUpdate(); });
+
         show();
         run();
     }
 
-    void status(const std::string &msg)
+    /// @brief update status display
+    /// @param msg 
+    void status(const std::string &msg);
+
+    /// @brief threadsafe status display update request
+    /// @param msg 
+    void statusAdd(const std::string &msg)
     {
-        int pc = 100 - msg.size();
-        std::string m(msg);
-        for (int k = 0; k < pc; k++)
-            m.push_back(' ');
-        lbStatus.text(m);
-        lbStatus.update();
+        std::lock_guard<std::mutex> lck(mtxStatus);
+        myStatusReady = msg;
     }
+
+    /// @brief threadsafe update status display
+    void StatusUpdate()
+    {
+        std::lock_guard<std::mutex> lck(mtxStatus);
+        if( !myStatusReady.empty() ) {
+            status( myStatusReady );
+            myStatusReady.clear();
+        }
+    }
+    
+    /* @brief Update status after an event on the tcp socket
+    /// @param e 
+    /// @return ""
+
+    The event handler is called from a thread in the tcp socket wrapper
+    It must not update the GUI from that thread
+    So it adds a request for a display update
+    The GUI thread will check reqularly and updates the display as required
+   */
     std::string eventHandler(
         const raven::set::cTCPex::sEvent &e)
     {
         switch (e.type)
         {
         case raven::set::cTCPex::eEvent::accept:
-            status("Connected to server");
+            statusAdd("Connected to server");
             return "";
         case raven::set::cTCPex::eEvent::disconnect:
-            status("Disconnected from server");
+            statusAdd("Disconnected from server");
             return "";
         case raven::set::cTCPex::eEvent::read:
-            status("server: " + e.msg);
+            statusAdd("server: " + e.msg);
             return "";
         default:
             return "";
@@ -104,7 +131,21 @@ private:
     wex::button &bnSend;
 
     raven::set::cTCPex tcpex;
+
+    std::mutex mtxStatus;
+    std::string myStatusReady;
+    wex::timer * myUpdateTimer;
 };
+
+void cGUI::status(const std::string &msg)
+{
+    int pc = 100 - msg.size();
+    std::string m(msg);
+    for (int k = 0; k < pc; k++)
+        m.push_back(' ');
+    lbStatus.text(m);
+    lbStatus.update();
+}
 
 main()
 {

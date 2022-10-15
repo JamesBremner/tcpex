@@ -251,6 +251,10 @@ namespace raven
                 // check for waiting job
                 bool fqwaiting;
                 {
+                    /* this is running in the shared job thread
+                    But the jobs are added to the queue from the client thread
+                    So, protect the queue from simulateineous accesses from different threads
+                    */
                     std::lock_guard<std::mutex> lck (mtxJobQ);
                     fqwaiting =  myJobQ.size();
                 }
@@ -265,10 +269,23 @@ namespace raven
                 // process job at front of queue
                 static sEvent e;
                 {
+                    /* this is running in the shared job thread
+                    But the jobs are added to the queue from the client thread
+                    So, protect the queue from simulateineous accesses from different threads
+                    by moving the job from the queue while the mutex is locked
+                    */
                     std::lock_guard<std::mutex> lck (mtxJobQ);
                     e = myJobQ.front();
                     myJobQ.pop();
                 }
+
+                /** run the event handler registered by the application code
+                 * and send the reply to the client that sent the job request.
+                 * The jobs run one by one in this thread
+                 * so no protection is required from the other jobs.
+                 * Care is needed if the jobs modify datas that is accessed
+                 * by any other threads in the application
+                 */
                 send(
                     myEventHandler(e),
                     e.client);
