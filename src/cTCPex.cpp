@@ -11,7 +11,7 @@ namespace raven
     {
 
         cTCPex::cTCPex()
-            : myEventHandler([](int, eEvent, const std::string &)
+            : myEventHandler([](const sEvent& )
                              { return ""; }),
               mySharedProcessingThread(false),
               myFrameLines(true)
@@ -191,10 +191,11 @@ namespace raven
         void cTCPex::readBlock(
             int client)
         {
-            myEventHandler(
-                client,
-                eEvent::accept,
-                "");
+            static sEvent e;
+            e.client = client;
+            e.type = eEvent::accept;
+            e.msg = "";
+            myEventHandler( e );
 
             while (true)
             {
@@ -205,10 +206,8 @@ namespace raven
                 if (!isConnected(client))
                 {
                     // invoke handler with disconnect message
-                    myEventHandler(
-                        client,
-                        eEvent::disconnect,
-                        "");
+                    e.type = eEvent::disconnect;
+                    myEventHandler( e );
 
                     // exit ( ends thread )
                     return;
@@ -231,11 +230,9 @@ namespace raven
                 else
                 {
                     // run the evenHandler in this thread
+                    e.type = eEvent::read;
                     send(
-                        myEventHandler(
-                            client,
-                            eEvent::read,
-                            line),
+                        myEventHandler( e ),
                         client);
                 }
             }
@@ -256,11 +253,12 @@ namespace raven
 
                 // process job at front of queue
                 auto &j = myJobQ.front();
+                static sEvent e;
+                e.client = j.client;
+                e.type = eEvent::read;
+                e.msg = j.msg;
                 send(
-                    myEventHandler(
-                        j.client,
-                        eEvent::read,
-                        j.msg),
+                    myEventHandler( e ),
                     j.client);
                 myJobQ.pop();
             }

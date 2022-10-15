@@ -47,9 +47,7 @@ public:
                         ebServerPort.text(),
                         std::bind(
                             &eventHandler, this,
-                            std::placeholders::_1,
-                            std::placeholders::_2,
-                            std::placeholders::_3)))
+                            std::placeholders::_1)))
                     status("NOT Connected to server");
                 else
                     status("Connected to server");
@@ -76,23 +74,22 @@ public:
         lbStatus.update();
     }
     std::string eventHandler(
-        int client,
-        raven::set::cTCPex::eEvent type,
-        const std::string &msg)
+        const raven::set::cTCPex::sEvent &e)
     {
-        switch (type)
+        switch (e.type)
         {
         case raven::set::cTCPex::eEvent::accept:
             status("Connected to server");
-            break;
+            return "";
         case raven::set::cTCPex::eEvent::disconnect:
             status("Disconnected from server");
-            break;
+            return "";
         case raven::set::cTCPex::eEvent::read:
-            status("server: " + msg);
-            break;
+            status("server: " + e.msg);
+            return "";
+        default:
+            return "";
         }
-        return "";
     }
 
 private:

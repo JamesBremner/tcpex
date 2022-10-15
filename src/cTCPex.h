@@ -22,7 +22,14 @@ namespace raven
                 disconnect,
             };
 
-            typedef std::function<std::string(int, eEvent, const std::string &)>
+            struct sEvent
+            {
+                int client;         // index of client generating event
+                eEvent type;        // event type
+                std::string msg;    // msg that generated ( read ) event
+            };
+
+            typedef std::function<std::string(const sEvent& e)>
                 eventHandler_t;
 
             cTCPex();
@@ -74,11 +81,8 @@ namespace raven
              - a client diconnects
              and runs in the thread connected to the client
 
-             eventHandler signature:  void h(
-                int client,
-                eEvent type,
-                const std::string& msg )
-
+             eventHandler signature:  std::string h( const sEvent& event )
+  
              client the index among connected clients of client that sent the message
              type of event
              msg the message received from the client
@@ -189,6 +193,12 @@ namespace raven
              */
             void readBlock(int client);
 
+            /** Wait for jobs
+             * 
+             * runs in its own thread, running jobs one by one from the job queue
+             * 
+             * Never returns
+             */
             void jobThread();
 
             /// Wait for client connection request
@@ -224,6 +234,7 @@ namespace raven
                 }
             };
 
+            /// @brief Queue of jobs waiting to run in mySharedProcessingThread
             std::queue<cJob> myJobQ;
         };
 

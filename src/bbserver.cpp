@@ -65,9 +65,7 @@ private:
     std::string myLastReplaced;
 
     std::string eventHandler(
-        int client,
-        raven::set::cTCPex::eEvent type,
-        const std::string &msg);
+        const raven::set::cTCPex::sEvent& e);
 
     /// @brief check that all characters in message are legal
     /// @param msg
@@ -173,9 +171,7 @@ void cServer::startServer()
             theConfig.serverPort,
             std::bind(
                 &eventHandler, this,
-                std::placeholders::_1,
-                std::placeholders::_2,
-                std::placeholders::_3),
+                std::placeholders::_1),
             2);
 
         std::cout << "Waiting for connection on port "
@@ -195,30 +191,28 @@ void cServer::startServer()
     }
 }
 std::string cServer::eventHandler(
-    int client,
-    raven::set::cTCPex::eEvent type,
-    const std::string &msg)
+    const raven::set::cTCPex::sEvent& e)
 {
-    switch (type)
+    switch (e.type)
     {
     case raven::set::cTCPex::eEvent::accept:
-        myTCPServer.send("0.0 greeting\n", client);
+        myTCPServer.send("0.0 greeting\n", e.client);
         return "";
     case raven::set::cTCPex::eEvent::disconnect:
-        std::cout << "disconnect event client " << client << "\n";
+        std::cout << "disconnect event client " << e.client << "\n";
         return "";
     case raven::set::cTCPex::eEvent::read:
     {
-        if (!checkLegal(msg))
+        if (!checkLegal(e.msg))
             return "ERROR illegal character";
 
         std::string cmdtext;
-        switch (parseCommand(msg, cmdtext))
+        switch (parseCommand(e.msg, cmdtext))
         {
         case eCommand::write:
         {
             cMessage M(cmdtext);
-            auto it = myMapUser.find(std::to_string(client));
+            auto it = myMapUser.find(std::to_string(e.client));
             if (it == myMapUser.end())
                 M.sender = "nobody";
             else
@@ -231,7 +225,7 @@ std::string cServer::eventHandler(
             cmdtext.erase(cmdtext.find("\n"));
             myMapUser.insert(
                 std::make_pair(
-                    std::to_string(client),
+                    std::to_string(e.client),
                     cmdtext));
             return "1.0 HELLO " + cmdtext + "\n";
 
@@ -246,7 +240,7 @@ std::string cServer::eventHandler(
 
         case eCommand::replace:
             replace(
-                std::to_string(client),
+                std::to_string(e.client),
                 cmdtext);
             return "";
 

@@ -31,9 +31,7 @@ public:
                     ebPort.text(),
                     std::bind(
                         &eventHandler, this,
-                        std::placeholders::_1,
-                        std::placeholders::_2,
-                        std::placeholders::_3),
+                        std::placeholders::_1),
                     1);
                 status("Waiting for client connection");
             });
@@ -57,11 +55,9 @@ private:
     }
 
     std::string eventHandler(
-        int client,
-        raven::set::cTCPex::eEvent type,
-        const std::string &msg)
+        const raven::set::cTCPex::sEvent& e)
     {
-        switch (type)
+        switch (e.type)
         {
         case raven::set::cTCPex::eEvent::accept:
             status("Client Connected");
@@ -70,10 +66,11 @@ private:
             status("Client disconnected");
             return "";
         case raven::set::cTCPex::eEvent::read:
-            status("Client: " + msg);
-            return msg;
+            status("Client: " + e.msg);
+            return e.msg;
+        default:
+            return "";
         }
-        return "";
     }
 };
 

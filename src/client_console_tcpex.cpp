@@ -49,17 +49,15 @@ void inputHandler()
 }
 
 std::string msgProcessor(
-    int client,
-    raven::set::cTCPex::eEvent type,
-    const std::string &msg)
+    const raven::set::cTCPex::sEvent& e )
 {
-    switch (type)
+    switch (e.type)
     {
     case raven::set::cTCPex::eEvent::accept:
         std::cout << "Connected\n";
         break;
     case raven::set::cTCPex::eEvent::read:
-        std::cout << "\nfrom server: " << msg << "\n";
+        std::cout << "\nfrom server: " << e.msg << "\n";
         break;
     }
     return "";
@@ -74,9 +72,7 @@ main(int argc, char *argv[])
         myServerPort,
         std::bind(
             &msgProcessor,
-            std::placeholders::_1,
-            std::placeholders::_2,
-            std::placeholders::_3));
+            std::placeholders::_1));
 
     inputHandler();
 

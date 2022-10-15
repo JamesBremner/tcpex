@@ -28,37 +28,33 @@ void parse_command_line_options(int argc, char *argv[])
 }
 
 std::string msgHandler1(
-    int client,
-    raven::set::cTCPex::eEvent type,
-    const std::string &msg)
+    const raven::set::cTCPex::sEvent& e)
 {
-    switch (type)
+    switch (e.type)
     {
     case raven::set::cTCPex::eEvent::accept:
-        std::cout << client << " client connected\n";
+        std::cout << e.client << " client connected\n";
         return "";
 
-        std::cout << "Copy from 1 " << msg << "\n";
-        tcpex2.send("REPLY: " + msg);
-        return msg;
+        std::cout << "Copy from 1 " << e.msg << "\n";
+        tcpex2.send("REPLY: " + e.msg);
+        return e.msg;
     default:
         return "";
     }
 }
 std::string msgHandler2(
-    int client,
-    raven::set::cTCPex::eEvent type,
-    const std::string &msg)
+    const raven::set::cTCPex::sEvent& e)
 {
-    switch (type)
+    switch (e.type)
     {
     case raven::set::cTCPex::eEvent::accept:
-        std::cout << client << " client connected\n";
+        std::cout << e.client << " client connected\n";
         return "";
     case raven::set::cTCPex::eEvent::read:
-        std::cout << "Copy from 2: " << msg << "\n";
-        tcpex1.send("REPLY: " + msg);
-        return msg;
+        std::cout << "Copy from 2: " << e.msg << "\n";
+        tcpex1.send("REPLY: " + e.msg);
+        return e.msg;
     default:
         return "";
     }
@@ -73,16 +69,12 @@ main(int argc, char *argv[])
         myServerPort1,
         std::bind(
             &msgHandler1,
-            std::placeholders::_1,
-            std::placeholders::_2,
-            std::placeholders::_3));
+            std::placeholders::_1));
     tcpex2.start_server(
         myServerPort2,
         std::bind(
             &msgHandler2,
-            std::placeholders::_1,
-            std::placeholders::_2,
-            std::placeholders::_3));
+            std::placeholders::_1));
 
     while (1)
         std::this_thread::sleep_for(std::chrono::seconds(1));

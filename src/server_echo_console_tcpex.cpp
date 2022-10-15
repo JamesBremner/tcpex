@@ -24,20 +24,19 @@ void parse_command_line_options(int argc, char *argv[])
 }
 
 std::string eventHandler(
-    int client,
-    raven::set::cTCPex::eEvent type,
-    const std::string &msg)
+    const raven::set::cTCPex::sEvent e)
 {
-    switch (type)
+    switch (e.type)
     {
     case raven::set::cTCPex::eEvent::accept:
         std::cout << "client connected\n";
         return "";
     case raven::set::cTCPex::eEvent::read:
-        tcpex.send("REPLY: " + msg);
-        return msg;
+        tcpex.send("REPLY: " + e.msg);
+        return e.msg;
+    default:
+         return "";
     }
-    return "";
 }
 
 main(int argc, char *argv[])
@@ -48,9 +47,7 @@ main(int argc, char *argv[])
         myServerPort,
         std::bind(
             &eventHandler,
-            std::placeholders::_1,
-            std::placeholders::_2,
-            std::placeholders::_3));
+            std::placeholders::_1));
 
     while (1)
         std::this_thread::sleep_for(std::chrono::seconds(1));
